@@ -252,27 +252,33 @@ class MLPBinaryClassifier:
         # BEGIN_YOUR_ANSWER
         loss = self.loss(pred, target)
         
-        dL_da2 = - (target / self.a2 - (1 - target) / (1 - self.a2))
-        da2_dz2 = self.a2 * (1 - self.a2)
+        a2 = self.a2.T.squeeze(0)
+        a1 = self.a1
+        
+        dL_da2 = - (target / a2 - (1 - target) / (1 - a2))
+        da2_dz2 = a2 * (1 - a2)
         dz2_db2 = 1
-        dz2_dW2 = self.a1
-        dz2_da1 = self.W2
+        
+        dL_db2 = dL_da2 * da2_dz2 * dz2_db2  # OK
+        
+        dz2_dW2 = a1
+        dL_dW2 = np.expand_dims((dL_da2 * da2_dz2) @ dz2_dW2, 1)  # OK?
+
+        dz2_da1 = self.W2.T
         da1_dz1 = self.a1 * (1 - self.a1)
         dz1_db1 = 1
-        dz1_dW1 = self.x
+        dz1_dW1 = self.x if len(self.x.shape) == 2 else np.expand_dims(self.x, 0)
         
-        dL_db2 = dL_da2 * da2_dz2 * dz2_db2
-        dL_dW2 = (dL_da2 * da2_dz2) @ dz2_dW2
-        dL_db1 = (dL_da2 @ da2_dz2) @ dz2_da1.T @ da1_dz1.T * dz1_db1
-        dL_dW1 = ((dL_da2 @ da2_dz2) @ dz2_da1.T @ da1_dz1.T) @ dz1_dW1
+        dL_db1 = np.expand_dims(dL_da2 * da2_dz2, 1) @ dz2_da1 * da1_dz1 * dz1_db1
+        dL_dW1 = ((np.expand_dims(dL_da2 * da2_dz2, 1) @ dz2_da1 * da1_dz1).T @ dz1_dW1).T
         
         gradient = {
-            "W1": dL_dW1.T,
-            "b1": dL_db1,
-            "W2": dL_dW2.T,
-            "b2": dL_db2
+            "W1": dL_dW1,
+            "b1": np.expand_dims(dL_db1.sum(axis=0), 0),
+            "W2": dL_dW2,
+            "b2": np.expand_dims(np.expand_dims(dL_db2.sum(), 0), 0)
         }
-        raise NotImplementedError()
+        # raise NotImplementedError()
         return gradient
         # END_YOUR_ANSWER
     
@@ -306,11 +312,13 @@ class MLPBinaryClassifier:
         """
         # BEGIN_YOUR_ANSWER
         for epoch in range(epochs):
-            pred = self.forward(X)
-            loss = self.loss(pred, Y)
-            gradients = self.backward(pred, Y)
-            self.update(gradients, learning_rate)
-            
+            for x, y in zip(X, Y):
+                pred = self.forward(x)
+                loss = self.loss(pred, y)
+                gradients = self.backward(pred, y)
+                self.update(gradients, learning_rate)
+        
+        
         return loss
         # END_YOUR_ANSWER
 
