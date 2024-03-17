@@ -1,0 +1,181 @@
+{'extraCredit': 0,
+ 'fatalError': False,
+ 'maxExtraCredit': 0,
+ 'maxTotalPoints': 14,
+ 'messages': [],
+ 'mode': 'auto',
+ 'parts': [{'description': '',
+            'extraCredit': False,
+            'maxPoints': 2,
+            'maxSeconds': 1,
+            'messages': [],
+            'name': '1a-1-hidden',
+            'points': 0,
+            'seconds': 0},
+           {'description': 'basic test',
+            'extraCredit': False,
+            'maxPoints': 1,
+            'maxSeconds': 1,
+            'messages': [],
+            'name': '2a-0-basic',
+            'points': 1,
+            'seconds': 0},
+           {'description': 'test multiple instances of the same word in a '
+                           'sentence',
+            'extraCredit': False,
+            'maxPoints': 1,
+            'maxSeconds': 1,
+            'messages': [],
+            'name': '2a-1-hidden',
+            'points': 0,
+            'seconds': 0},
+           {'description': 'basic sanity check for learning correct weights on '
+                           'two training and testing examples each',
+            'extraCredit': False,
+            'maxPoints': 1,
+            'maxSeconds': 1,
+            'messages': [],
+            'name': '2b-0-basic',
+            'points': 1,
+            'seconds': 0},
+           {'description': 'test correct overriding of positive weight due to '
+                           'one negative instance with repeated words',
+            'extraCredit': False,
+            'maxPoints': 1,
+            'maxSeconds': 1,
+            'messages': [],
+            'name': '2b-1-basic',
+            'points': 1,
+            'seconds': 0},
+           {'description': 'test classifier on real polarity dev dataset',
+            'extraCredit': False,
+            'maxPoints': 6,
+            'maxSeconds': 8,
+            'messages': [],
+            'name': '2b-2-basic',
+            'points': 6,
+            'seconds': 1},
+           {'description': 'test basic ngram features',
+            'extraCredit': False,
+            'maxPoints': 1,
+            'maxSeconds': 1,
+            'messages': [],
+            'name': '2c-0-basic',
+            'points': 1,
+            'seconds': 0},
+           {'description': 'test feature extraction on random sentence and '
+                           'random length',
+            'extraCredit': False,
+            'maxPoints': 2,
+            'maxSeconds': 1,
+            'messages': [],
+            'name': '2c-1-hidden',
+            'points': 0,
+            'seconds': 0},
+           {'description': 'test forward function on XOR dataset',
+            'extraCredit': False,
+            'maxPoints': 1,
+            'maxSeconds': 1,
+            'messages': [],
+            'name': '3a-0-basic',
+            'points': 1,
+            'seconds': 0},
+           {'description': 'test forward function on random data',
+            'extraCredit': False,
+            'maxPoints': 3,
+            'maxSeconds': 1,
+            'messages': [],
+            'name': '3a-1-hidden',
+            'points': 0,
+            'seconds': 0},
+           {'description': 'test loss function on XOR dataset',
+            'extraCredit': False,
+            'maxPoints': 1,
+            'maxSeconds': 1,
+            'messages': [],
+            'name': '3b-0-basic',
+            'points': 1,
+            'seconds': 0},
+           {'description': 'test backward function on XOR dataset',
+            'extraCredit': False,
+            'maxPoints': 1,
+            'maxSeconds': 1,
+            'messages': ["Exception thrown: <class 'NotImplementedError'> -- ",
+                         '  File "c:/Users/leeyo/OneDrive/πŸ≈¡ '
+                         '»≠∏È/CSED342/HW2/HW2_rev2/grader.py", line 192, in '
+                         'test3b1\n'
+                         '    gradients = mlp.backward(pred, Y)\n',
+                         '  File "c:\\Users\\leeyo\\OneDrive\\πŸ≈¡ '
+                         '»≠∏È\\CSED342\\HW2\\HW2_rev2\\submission.py", line '
+                         '275, in backward\n'
+                         '    raise NotImplementedError()\n'],
+            'name': '3b-1-basic',
+            'points': 0,
+            'seconds': 0},
+           {'description': 'test backward function on random data',
+            'extraCredit': False,
+            'maxPoints': 6,
+            'maxSeconds': 1,
+            'messages': ["Exception thrown: <class 'NotImplementedError'> -- ",
+                         '  File "c:/Users/leeyo/OneDrive/πŸ≈¡ '
+                         '»≠∏È/CSED342/HW2/HW2_rev2/grader.py", line 243, in '
+                         'test3b2\n'
+                         '    all(get_gen())\n',
+                         '  File "c:/Users/leeyo/OneDrive/πŸ≈¡ '
+                         '»≠∏È/CSED342/HW2/HW2_rev2/grader.py", line 235, in '
+                         'get_gen\n'
+                         '    gradients = mlp.backward(pred, test_Y)\n',
+                         '  File "c:\\Users\\leeyo\\OneDrive\\πŸ≈¡ '
+                         '»≠∏È\\CSED342\\HW2\\HW2_rev2\\submission.py", line '
+                         '275, in backward\n'
+                         '    raise NotImplementedError()\n'],
+            'name': '3b-2-hidden',
+            'points': 0,
+            'seconds': 0},
+           {'description': 'test train function on XOR dataset',
+            'extraCredit': False,
+            'maxPoints': 1,
+            'maxSeconds': 10,
+            'messages': ["Exception thrown: <class 'NotImplementedError'> -- ",
+                         '  File "c:/Users/leeyo/OneDrive/πŸ≈¡ '
+                         '»≠∏È/CSED342/HW2/HW2_rev2/grader.py", line 250, in '
+                         'test3c0\n'
+                         '    grader.requireIsEqual(0.02855617, mlp.train(X, '
+                         'Y, epochs=1000, learning_rate=0.1), 0.0001)\n',
+                         '  File "c:\\Users\\leeyo\\OneDrive\\πŸ≈¡ '
+                         '»≠∏È\\CSED342\\HW2\\HW2_rev2\\submission.py", line '
+                         '311, in train\n'
+                         '    gradients = self.backward(pred, Y)\n',
+                         '  File "c:\\Users\\leeyo\\OneDrive\\πŸ≈¡ '
+                         '»≠∏È\\CSED342\\HW2\\HW2_rev2\\submission.py", line '
+                         '275, in backward\n'
+                         '    raise NotImplementedError()\n'],
+            'name': '3c-0-basic',
+            'points': 0,
+            'seconds': 0},
+           {'description': 'test train function on random data',
+            'extraCredit': False,
+            'maxPoints': 1,
+            'maxSeconds': 10,
+            'messages': ["Exception thrown: <class 'NotImplementedError'> -- ",
+                         '  File "c:/Users/leeyo/OneDrive/πŸ≈¡ '
+                         '»≠∏È/CSED342/HW2/HW2_rev2/grader.py", line 269, in '
+                         'test3c1\n'
+                         '    all(get_gen())\n',
+                         '  File "c:/Users/leeyo/OneDrive/πŸ≈¡ '
+                         '»≠∏È/CSED342/HW2/HW2_rev2/grader.py", line 262, in '
+                         'get_gen\n'
+                         '    loss = mlp.train(test_X, test_Y, epochs=10, '
+                         'learning_rate=0.1)\n',
+                         '  File "c:\\Users\\leeyo\\OneDrive\\πŸ≈¡ '
+                         '»≠∏È\\CSED342\\HW2\\HW2_rev2\\submission.py", line '
+                         '311, in train\n'
+                         '    gradients = self.backward(pred, Y)\n',
+                         '  File "c:\\Users\\leeyo\\OneDrive\\πŸ≈¡ '
+                         '»≠∏È\\CSED342\\HW2\\HW2_rev2\\submission.py", line '
+                         '275, in backward\n'
+                         '    raise NotImplementedError()\n'],
+            'name': '3c-1-hidden',
+            'points': 0,
+            'seconds': 0}],
+ 'totalPoints': 12}

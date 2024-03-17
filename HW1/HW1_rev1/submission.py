@@ -190,26 +190,47 @@ def mutate_sentences(sentence: str) -> List[str]:
     """
     # BEGIN_YOUR_CODE (our solution is 17 lines of code, but don't worry if you deviate from this)
     list_of_word = sentence.split()
-    dict_of_graph = {}
+    unique_list_of_word = list(set(list_of_word))
     list_of_sentence = []
-    list_of_mark = []
+    dict_of_word_index = {}
+    matrix = [[0 for i in range(len(unique_list_of_word))] for j in range(len(unique_list_of_word))]
+    max_path_length = len(list_of_word)
     
-    for i in range(0, len(list_of_word) - 1):
+    for i, word in enumerate(unique_list_of_word):
+        dict_of_word_index[word] = i  
+    
+    # Construct the adjacency matrix
+    for i in range(len(list_of_word) - 1):
         first_word, second_word = list_of_word[i], list_of_word[i + 1]
-        if first_word in dict_of_graph.keys():
-            dict_of_graph[first_word].add(second_word)
-        else:
-            dict_of_graph[first_word] = set()
-            
-        if second_word in dict_of_graph.keys():
-            dict_of_graph[second_word].add(first_word)
-        else:
-            dict_of_graph[second_word] = set()
+        matrix[dict_of_word_index[first_word]][dict_of_word_index[second_word]] = 1    
     
-    for root in dict_of_graph.keys():
-        dict_of_graph
+    # Construct the sentence using BFS
+    for start_word in unique_list_of_word:
         
+        queue = []
         
+        root = {
+            "word": start_word,
+            "path": [start_word],
+            "next": [word for word in unique_list_of_word if matrix[dict_of_word_index[start_word]][dict_of_word_index[word]] == 1]
+        }
         
-    return list(set(list_of_sentence))
+        queue.append(root)
+        
+        while queue:
+            current_node = queue.pop(0)
+            
+            if len(current_node["path"]) == max_path_length:
+                list_of_sentence.append(' '.join(current_node["path"]))
+                continue
+                
+            for next_word in current_node["next"]:
+                next_node = {
+                    "word": next_word,
+                    "path": current_node["path"] + [next_word],
+                    "next": [word for word in unique_list_of_word if matrix[dict_of_word_index[next_word]][dict_of_word_index[word]] == 1]
+                }
+                queue.append(next_node)
+        
+    return list(set(list_of_sentence)) 
     # END_YOUR_CODE
