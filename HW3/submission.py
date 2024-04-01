@@ -231,6 +231,8 @@ def UCSMazeSearch(start: tuple, goal: tuple, moveCost: Callable[[tuple, str], fl
     
     # BEGIN_YOUR_CODE (our solution is 4 lines of code, but don't worry if you deviate from this)
     cost = ucs.totalCost
+    if cost is None:
+        return 99999999  # no path value from utils
     return cost
     # END_YOUR_CODE
 
@@ -251,7 +253,25 @@ def AStarMazeSearch(start: tuple, goal: tuple, moveCost: Callable[[tuple, str], 
     ucs.solve(MazeProblem(start, goal, moveCost, possibleMoves), heuristic=consistentHeuristic(goal))
     
     # BEGIN_YOUR_CODE (our solution is 13 lines of code, but don't worry if you deviate from this)
-    cost = len(ucs.actions)  # cost is one per edge, length of path should be same with total cost 
+    cost = 0
+    shifted_states = ucs.actions[1:] + [goal]  # Shift actions to get cost
+    
+    def map_direction(state, shifted_state):
+        dx = shifted_state[1] - state[1]
+        dy = shifted_state[0] - state[0] 
+        
+        if dx == 1 and dy == 0:
+            return "RIGHT"
+        elif dx == -1 and dy == 0:
+            return "LEFT"
+        elif dx == 0 and dy == 1:
+            return "DOWN"
+        elif dx == 0 and dy == -1:
+            return "UP"
+       
+    for state, shifted_state in zip(ucs.actions, shifted_states):
+        cost += moveCost(state, map_direction(state, shifted_state))  # calculate cost
+    
     return cost
     # END_YOUR_CODE
 
