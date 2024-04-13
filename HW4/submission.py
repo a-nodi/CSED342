@@ -122,55 +122,50 @@ class BlackjackMDP(util.MDP):
     # in the list returned by succAndProbReward.
     def succAndProbReward(self, state, action):
         # BEGIN_YOUR_ANSWER (our solution is 44 lines of code, but don't worry if you deviate from this)
-        
         total_card_value_in_hand, next_card_index_if_peeked, deck_card_counts = state
         is_peeked = next_card_index_if_peeked is not None
+        is_no_remaining_card = deck_card_counts is None
         
         list_of_succ_prob_reward = []
         
+        # Helper function to get the deck after the player peeked
         def get_peeked_deck(_card_index, _deck_card_counts):
             list_of_deck = list(_deck_card_counts)
             list_of_deck[_card_index] -= 1
             
             return tuple(list_of_deck) if sum(list_of_deck) > 0 else None
             
-        def peek(_card_index, _deck_card_counts, _total_card_value_in_hand):
-            _deck_card_counts = get_peeked_deck(_card_index, _deck_card_counts)
-            _value = _total_card_value_in_hand + self.cardValues[_card_index]
-            _reward = value if sum(_deck_card_counts) == 0 else 0
-            
-            return _value, _total_card_value_in_hand, _reward
-            
-        if deck_card_counts is None:  # END state
+        # Early terminations
+        if is_no_remaining_card:  # END state
             return []
         
         if total_card_value_in_hand > self.threshold:  # Busted
             return []
         
-        if action == 'Take':
-            if is_peeked:
+        if action == 'Peek' and is_peeked:  # Can't peek twice
+            return []
+        
+        if action == 'Take':  # Take action
+            if is_peeked:  # If the player peeked
                 card_value = self.cardValues[next_card_index_if_peeked]  # Determine the value of the next card
                 is_busted = total_card_value_in_hand + card_value > self.threshold  # Check if the player busts
                 
                 # Update the deck if the player peeked
-                next_deck_card_counts = get_peeked_deck(next_card_index_if_peeked, deck_card_counts)
+                next_deck_card_counts = get_peeked_deck(next_card_index_if_peeked, deck_card_counts)  # Update the deck
                 next_deck_card_counts = None if is_busted else next_deck_card_counts  # if the player busts, set the deck to None                
-
+                is_next_no_remaining_card = next_deck_card_counts is None  # Check if there is no remaining card
+                
+                # succ, prob, reward
                 succ = (total_card_value_in_hand + card_value, None, next_deck_card_counts)
                 prob = 1
-                
-                if is_busted:
-                    reward = 0
-                elif next_deck_card_counts is None:
-                    reward = total_card_value_in_hand + card_value
-                else:
-                    reward = 0
+                reward = total_card_value_in_hand + card_value if not is_busted and is_next_no_remaining_card else 0
                 
                 list_of_succ_prob_reward.append((succ, prob, reward))
             
-            else:
-                total_card_count = sum(deck_card_counts)
+            else:  # If the player didn't peek
+                total_card_count = sum(deck_card_counts)  # Total number of cards in the deck
                 
+                # Iterate over all possible card values
                 for card_index, card_count in enumerate(deck_card_counts):
                     if card_count == 0:
                         continue
@@ -179,39 +174,36 @@ class BlackjackMDP(util.MDP):
                     is_busted = total_card_value_in_hand + card_value > self.threshold  # Check if the player busts
 
                     # Update the deck if the player didn't peek
-                    next_deck_card_counts = get_peeked_deck(card_index, deck_card_counts)
+                    next_deck_card_counts = get_peeked_deck(card_index, deck_card_counts)  # Update the deck
                     next_deck_card_counts = None if is_busted else next_deck_card_counts  # if the player busts, set the deck to None                
+                    is_next_no_remaining_card = next_deck_card_counts is None  # Check if there is no remaining card
                     
+                    # succ, prob, reward
                     succ = (total_card_value_in_hand + card_value, None, next_deck_card_counts)
                     prob = card_count / total_card_count
-                    
-                    if is_busted:
-                        reward = 0
-                    elif next_deck_card_counts is None:
-                        reward = total_card_value_in_hand + card_value
-                    else:
-                        reward = 0
+                    reward = total_card_value_in_hand + card_value if not is_busted and is_next_no_remaining_card else 0
                     
                     list_of_succ_prob_reward.append((succ, prob, reward))
                 
-        elif action == 'Peek':
-            
-            total_card_count = sum(deck_card_counts)
+        elif action == 'Peek':  # Peek action
+            total_card_count = sum(deck_card_counts)  # Total number of cards in the deck
             
             # Iterate over all possible card values
             for card_index, card_count in enumerate(deck_card_counts):
                 if card_count == 0:
                     continue
                 
-                # card_value = self.cardValues[card_index]
+                # succ, prob, reward
                 succ = (total_card_value_in_hand, card_index, deck_card_counts)
                 prob = card_count / total_card_count
                 reward = -self.peekCost
                 
                 list_of_succ_prob_reward.append((succ, prob, reward))
         
-        elif action == 'Quit':
-            is_busted = total_card_value_in_hand > self.threshold
+        elif action == 'Quit':  # Quit action
+            is_busted = total_card_value_in_hand > self.threshold  # Check if the player busts
+            
+            # succ, prob, reward
             succ = (total_card_value_in_hand, None, None)
             prob = 1
             reward = total_card_value_in_hand if not is_busted else 0
