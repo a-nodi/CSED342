@@ -50,16 +50,17 @@ class VolcanoCrossing():
     # Return the value table after updating the value of each grid cell.
     def value_update(self, value_table):
         # BEGIN_YOUR_ANSWER (our solution is 14 lines of code, but don't worry if you deviate from this)
+        new_value_table = np.zeros_like(value_table)
         for i in range(self.grid_world.shape[0]):
             for j in range(self.grid_world.shape[1]):
                 
                 # Fixed value for Volcano and Island
                 if self.is_volcano_or_island((i, j)):
-                    value_table[(i, j)] = self.grid_world[(i, j)]
+                    new_value_table[(i, j)] = self.grid_world[(i, j)]
                     continue
                     
                 # Initialize max_val
-                max_val = float('-inf')
+                max_value = float('-inf')
                 
                 # iterate over all possible actions
                 for action in self.actions:
@@ -72,12 +73,12 @@ class VolcanoCrossing():
                     new_state = (x, y)
                     
                     # Update max_val
-                    max_val = max(max_val, self.moveReward + self.discount * value_table[new_state])
+                    max_value = max(max_value, self.moveReward + self.discount * value_table[new_state])
                 
                 # Update value_table
-                value_table[(i, j)] = max_val
+                new_value_table[(i, j)] = max_value
         
-        return value_table
+        return new_value_table
         # END_YOUR_ANSWER
 
 ############################################################
@@ -335,12 +336,12 @@ def identityFeatureExtractor(state, action):
 #       Only add these features if the deck != None
 
 def blackjackFeatureExtractor(state, action):
-    total, nextCard, counts = state
+    total_card_value_in_hand, next_card_index_if_peeked, deck_card_counts = state
     # BEGIN_YOUR_ANSWER (our solution is 8 lines of code, but don't worry if you deviate from this)
-    counts = [] if counts is None else counts
-    first_feature = ((total, action), 1)
-    second_feature = ((tuple([1 if count > 0 else 0 for count in counts]), action), 1)
-    third_feature = [((i, count, action), 1) for i, count in enumerate(counts)]
+    deck_card_counts = [] if deck_card_counts is None else deck_card_counts
+    first_feature = ((total_card_value_in_hand, action), 1)
+    second_feature = ((tuple([1 if count > 0 else 0 for count in deck_card_counts]), action), 1)
+    third_feature = [((i, count, action), 1) for i, count in enumerate(deck_card_counts)]
     
     return [first_feature, second_feature, *third_feature]
     
