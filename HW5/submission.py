@@ -175,14 +175,16 @@ class MinimaxAgent(MultiAgentSearchAgent):
       # Sub depth if all agents have done their action
       depth = depth - 1 if nextAgentIndex == PLAYER else depth
       
+      legalActions = gameState.getLegalActions(agentIndex)
+      
       if agentIndex == PLAYER:  # Current agent is player
         # Recursively search child nodes.
-        list_of_action_and_q_value = [(action, minimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
+        list_of_action_and_q_value = [(action, minimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in legalActions]
         optimal_action, q_value = max(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])  # Get player's max action and value
       
       else:  # Current player is ghost
         # Recursively search child nodes.
-        list_of_action_and_q_value = [(action, minimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
+        list_of_action_and_q_value = [(action, minimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in legalActions]
         optimal_action, q_value = min(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])  # Get Ghost's min action and value
     
       return (optimal_action, q_value)
@@ -212,14 +214,16 @@ class MinimaxAgent(MultiAgentSearchAgent):
       # Sub depth if all agents have done their action
       depth = depth - 1 if nextAgentIndex == PLAYER else depth
       
+      legalActions = gameState.getLegalActions(agentIndex)
+      
       if agentIndex == PLAYER:  # Current agent is player
         # Recursively search child nodes.
-        list_of_action_and_q_value = [(action, minimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
+        list_of_action_and_q_value = [(action, minimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in legalActions]
         optimal_action, q_value = max(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])  # Get player's max action and value
       
       else:  # Current player is ghost
         # Recursively search child nodes.
-        list_of_action_and_q_value = [(action, minimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
+        list_of_action_and_q_value = [(action, minimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in legalActions]
         optimal_action, q_value = min(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])  # Get Ghost's min action and value
     
       return (optimal_action, q_value)
@@ -248,8 +252,8 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     Q_VALUE = 1
     PLAYER = 0
     
-    def getProb(agentIndex, _action):
-      return 1 / len(gameState.getLegalActions(agentIndex))
+    def getProb(_gameState, agentIndex, _action):
+      return 1 / len(_gameState.getLegalActions(agentIndex))
     
     def expectimaxSearch(gameState, depth, agentIndex):
       if gameState.isWin() or gameState.isLose() or depth == 0:  # Terminal node
@@ -261,19 +265,21 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       # Sub depth if all agents have done their action
       depth = depth - 1 if nextAgentIndex == PLAYER else depth
       
+      legalActions = gameState.getLegalActions(agentIndex)
+      
       if agentIndex == PLAYER:  # Current agent is player
         # Recursively search child nodes.
-        list_of_action_and_q_value = [(action, expectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
+        list_of_action_and_q_value = [(action, expectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in legalActions]
         optimal_action, q_value = max(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])
-        
+
       else:  # Current agent is ghosts
         # Recurisvely search child nodes.
-        list_of_q_value = [expectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE] for action in gameState.getLegalActions(agentIndex)]
-        list_of_prob = [getProb(agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
+        list_of_q_value = [expectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE] for action in legalActions]
+        list_of_prob = [getProb(gameState, agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
         optimal_action, q_value = None, sum([prob * partial_q for prob, partial_q in zip(list_of_prob, list_of_q_value)])
       
       return (optimal_action, q_value)
-    
+
     return expectimaxSearch(gameState, self.depth, PLAYER)[ACTION]
     # END_YOUR_ANSWER
   
@@ -286,8 +292,8 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     Q_VALUE = 1
     PLAYER = 0
     
-    def getProb(agentIndex, _action):
-      return 1 / len(gameState.getLegalActions(agentIndex))
+    def getProb(_gameState, agentIndex, _action):
+      return 1 / len(_gameState.getLegalActions(agentIndex))
     
     def expectimaxSearch(gameState, depth, agentIndex):
       if gameState.isWin() or gameState.isLose() or depth == 0:  # Terminal node
@@ -299,15 +305,17 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       # Sub depth if all agents have done their action
       depth = depth - 1 if nextAgentIndex == PLAYER else depth
       
+      legalActions = gameState.getLegalActions(agentIndex)
+      
       if agentIndex == PLAYER:  # Current agent is player
         # Recursively search child nodes.
-        list_of_action_and_q_value = [(action, expectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
+        list_of_action_and_q_value = [(action, expectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in legalActions]
         optimal_action, q_value = max(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])
         
       else:  # Current agent is ghosts
         # Recurisvely search child nodes.
-        list_of_q_value = [expectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE] for action in gameState.getLegalActions(agentIndex)]
-        list_of_prob = [getProb(agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
+        list_of_q_value = [expectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE] for action in legalActions]
+        list_of_prob = [getProb(gameState, agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
         optimal_action, q_value = None, sum([prob * partial_q for prob, partial_q in zip(list_of_prob, list_of_q_value)])
       
       return (optimal_action, q_value)
@@ -337,8 +345,8 @@ class BiasedExpectimaxAgent(MultiAgentSearchAgent):
     Q_VALUE = 1
     PLAYER = 0
     
-    def getProb(agentIndex, _action):
-      return 0.5 + 0.5 / len(gameState.getLegalActions(agentIndex)) if _action == Directions.STOP else 0.5 / len(gameState.getLegalActions(agentIndex))
+    def getProb(_gameState, agentIndex, _action):
+      return 0.5 + 0.5 / len(_gameState.getLegalActions(agentIndex)) if _action == Directions.STOP else 0.5 / len(_gameState.getLegalActions(agentIndex))
     
     def biasedExpectimaxSearch(gameState, depth, agentIndex):
       if gameState.isWin() or gameState.isLose() or depth == 0:  # Terminal node
@@ -350,15 +358,17 @@ class BiasedExpectimaxAgent(MultiAgentSearchAgent):
       # Sub depth if all agents have done their action
       depth = depth - 1 if nextAgentIndex == PLAYER else depth
       
+      legalActions = gameState.getLegalActions(agentIndex)
+      
       if agentIndex == PLAYER:  # Current agent is player
         # Recursively search child nodes.
-        list_of_action_and_q_value = [(action, biasedExpectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
+        list_of_action_and_q_value = [(action, biasedExpectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in legalActions]
         optimal_action, q_value = max(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])
         
       else:  # Current agent is ghosts
         # Recurisvely search child nodes.
-        list_of_q_value = [biasedExpectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE] for action in gameState.getLegalActions(agentIndex)]
-        list_of_prob = [getProb(agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
+        list_of_q_value = [biasedExpectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE] for action in legalActions]
+        list_of_prob = [getProb(gameState, agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
         optimal_action, q_value = None, sum([prob * partial_q for prob, partial_q in zip(list_of_prob, list_of_q_value)])
       
       return (optimal_action, q_value)
@@ -375,8 +385,8 @@ class BiasedExpectimaxAgent(MultiAgentSearchAgent):
     Q_VALUE = 1
     PLAYER = 0
     
-    def getProb(agentIndex, _action):
-      return 0.5 + 0.5 / len(gameState.getLegalActions(agentIndex)) if _action == Directions.STOP else 0.5 / len(gameState.getLegalActions(agentIndex))
+    def getProb(_gameState, agentIndex, _action):
+      return 0.5 + 0.5 / len(_gameState.getLegalActions(agentIndex)) if _action == Directions.STOP else 0.5 / len(_gameState.getLegalActions(agentIndex))
     
     def biasedExpectimaxSearch(gameState, depth, agentIndex):
       if gameState.isWin() or gameState.isLose() or depth == 0:  # Terminal node
@@ -388,15 +398,17 @@ class BiasedExpectimaxAgent(MultiAgentSearchAgent):
       # Sub depth if all agents have done their action
       depth = depth - 1 if nextAgentIndex == PLAYER else depth
       
+      legalActions = gameState.getLegalActions(agentIndex)
+      
       if agentIndex == PLAYER:  # Current agent is player
         # Recursively search child nodes.
-        list_of_action_and_q_value = [(action, biasedExpectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
+        list_of_action_and_q_value = [(action, biasedExpectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in legalActions]
         optimal_action, q_value = max(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])
         
       else:  # Current agent is ghosts
         # Recurisvely search child nodes.
-        list_of_q_value = [biasedExpectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE] for action in gameState.getLegalActions(agentIndex)]
-        list_of_prob = [getProb(agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
+        list_of_q_value = [biasedExpectimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE] for action in legalActions]
+        list_of_prob = [getProb(gameState, agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
         optimal_action, q_value = None, sum([prob * partial_q for prob, partial_q in zip(list_of_prob, list_of_q_value)])
       
       return (optimal_action, q_value)
@@ -425,8 +437,8 @@ class ExpectiminimaxAgent(MultiAgentSearchAgent):
     Q_VALUE = 1
     PLAYER = 0
     
-    def getProb(agentIndex, _action):
-      return 1 / len(gameState.getLegalActions(agentIndex))
+    def getProb(_gameState, agentIndex, _action):
+      return 1 / len(_gameState.getLegalActions(agentIndex))
     
     def expectiminimaxSearch(gameState, depth, agentIndex):
       if gameState.isWin() or gameState.isLose() or depth == 0:  # Terminal node
@@ -438,20 +450,22 @@ class ExpectiminimaxAgent(MultiAgentSearchAgent):
       # Sub depth if all agents have done their action
       depth = depth - 1 if nextAgentIndex == PLAYER else depth
       
+      legalActions = gameState.getLegalActions(agentIndex)
+      
       if agentIndex == PLAYER:  # Current agent is player
         # Recursively search child nodes.
-        list_of_action_and_q_value = [(action, expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
+        list_of_action_and_q_value = [(action, expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in legalActions]
         optimal_action, q_value = max(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])
         
       elif agentIndex % 2 == 1:  # Current agent is odd-numbered ghosts
         # Recursively search child nodes.
-        list_of_action_and_q_value = [(action, expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
+        list_of_action_and_q_value = [(action, expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in legalActions]
         optimal_action, q_value = min(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])  # Get Ghost's min action and value
         
       elif agentIndex % 2 == 0:  # Current agent is even-numbered ghosts
         # Recurisvely search child nodes.
-        list_of_q_value = [expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE] for action in gameState.getLegalActions(agentIndex)]
-        list_of_prob = [getProb(agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
+        list_of_q_value = [expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE] for action in legalActions]
+        list_of_prob = [getProb(gameState, agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
         optimal_action, q_value = None, sum([prob * partial_q for prob, partial_q in zip(list_of_prob, list_of_q_value)])
       
       return (optimal_action, q_value)
@@ -468,8 +482,8 @@ class ExpectiminimaxAgent(MultiAgentSearchAgent):
     Q_VALUE = 1
     PLAYER = 0
     
-    def getProb(agentIndex, _action):
-      return 1 / len(gameState.getLegalActions(agentIndex))
+    def getProb(_gameState, agentIndex, _action):
+      return 1 / len(_gameState.getLegalActions(agentIndex))
     
     def expectiminimaxSearch(gameState, depth, agentIndex):
       if gameState.isWin() or gameState.isLose() or depth == 0:  # Terminal node
@@ -481,20 +495,22 @@ class ExpectiminimaxAgent(MultiAgentSearchAgent):
       # Sub depth if all agents have done their action
       depth = depth - 1 if nextAgentIndex == PLAYER else depth
       
+      legalActions = gameState.getLegalActions(agentIndex)
+      
       if agentIndex == PLAYER:  # Current agent is player
         # Recursively search child nodes.
-        list_of_action_and_q_value = [(action, expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
+        list_of_action_and_q_value = [(action, expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in legalActions]
         optimal_action, q_value = max(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])
         
       elif agentIndex % 2 == 1:  # Current agent is odd-numbered ghosts
         # Recursively search child nodes.
-        list_of_action_and_q_value = [(action, expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
+        list_of_action_and_q_value = [(action, expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in legalActions]
         optimal_action, q_value = min(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])  # Get Ghost's min action and value
         
       elif agentIndex % 2 == 0:  # Current agent is even-numbered ghosts
         # Recurisvely search child nodes.
-        list_of_q_value = [expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE] for action in gameState.getLegalActions(agentIndex)]
-        list_of_prob = [getProb(agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
+        list_of_q_value = [expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE] for action in legalActions]
+        list_of_prob = [getProb(gameState, agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
         optimal_action, q_value = None, sum([prob * partial_q for prob, partial_q in zip(list_of_prob, list_of_q_value)])
       
       return (optimal_action, q_value)
@@ -520,8 +536,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     Q_VALUE = 1
     PLAYER = 0
     
-    def getProb(agentIndex, _action):
-      return 1 / len(gameState.getLegalActions(agentIndex))
+    def getProb(_gameState, agentIndex, _action):
+      return 1 / len(_gameState.getLegalActions(agentIndex))
     
     def alphabetaSearch(gameState, depth, agentIndex, alpha, beta):
       if gameState.isWin() or gameState.isLose() or depth == 0:  # Terminal node
@@ -533,21 +549,23 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       # Sub depth if all agents have done their action
       depth = depth - 1 if nextAgentIndex == PLAYER else depth
       
+      legalActions = gameState.getLegalActions(agentIndex)
+      
       if agentIndex == PLAYER:  # Current agent is player
         optimal_action, q_value = None, float('-inf')
         # Recursively search child nodes.
-        for action in gameState.getLegalActions(agentIndex):
+        for action in legalActions:
           _action, _q_value = alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)
           optimal_action, q_value = max((action, _q_value), (optimal_action, q_value), key=lambda pair: pair[Q_VALUE])
           alpha = max(alpha, q_value)  # Update alpha 
           
           if beta <= alpha:  # Pruning
             break
-        
+          
       elif agentIndex % 2 == 1:  # Current agent is odd-numbered ghosts
         optimal_action, q_value = None, float('inf')
         # Recursively search child nodes.
-        for action in gameState.getLegalActions(agentIndex):
+        for action in legalActions:
           _action, _q_value = alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)
           optimal_action, q_value = min((action, _q_value), (optimal_action, q_value), key=lambda pair: pair[Q_VALUE])
           beta = min(beta, q_value)  # Update beta
@@ -557,8 +575,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         
       elif agentIndex % 2 == 0:  # Current agent is even-numbered ghosts
         # Recurisvely search child nodes.
-        list_of_q_value = [alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)[Q_VALUE] for action in gameState.getLegalActions(agentIndex)]
-        list_of_prob = [getProb(agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
+        list_of_q_value = [alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)[Q_VALUE] for action in legalActions]
+        list_of_prob = [getProb(gameState, agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
         optimal_action, q_value = None, sum([prob * partial_q for prob, partial_q in zip(list_of_prob, list_of_q_value)])
       
       return (optimal_action, q_value)
@@ -575,8 +593,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     Q_VALUE = 1
     PLAYER = 0
     
-    def getProb(agentIndex, _action):
-      return 1 / len(gameState.getLegalActions(agentIndex))
+    def getProb(_gameState, agentIndex, _action):
+      return 1 / len(_gameState.getLegalActions(agentIndex))
     
     def alphabetaSearch(gameState, depth, agentIndex, alpha, beta):
       if gameState.isWin() or gameState.isLose() or depth == 0:  # Terminal node
@@ -588,13 +606,15 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       # Sub depth if all agents have done their action
       depth = depth - 1 if nextAgentIndex == PLAYER else depth
       
+      legalActions = gameState.getLegalActions(agentIndex)
+      
       if agentIndex == PLAYER:  # Current agent is player
         optimal_action, q_value = None, float('-inf')
         # Recursively search child nodes.
-        for action in gameState.getLegalActions(agentIndex):
+        for action in legalActions:
           _action, _q_value = alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)
-          optimal_action, q_value = (action, _q_value) if _q_value > q_value else (optimal_action, q_value)
-          alpha = max(alpha, q_value)  # Update alpha
+          optimal_action, q_value = max((action, _q_value), (optimal_action, q_value), key=lambda pair: pair[Q_VALUE])
+          alpha = max(alpha, q_value)  # Update alpha 
           
           if beta <= alpha:  # Pruning
             break
@@ -602,9 +622,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       elif agentIndex % 2 == 1:  # Current agent is odd-numbered ghosts
         optimal_action, q_value = None, float('inf')
         # Recursively search child nodes.
-        for action in gameState.getLegalActions(agentIndex):
+        for action in legalActions:
           _action, _q_value = alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)
-          optimal_action, q_value = (action, _q_value) if _q_value < q_value else (optimal_action, q_value)
+          optimal_action, q_value = min((action, _q_value), (optimal_action, q_value), key=lambda pair: pair[Q_VALUE])
           beta = min(beta, q_value)  # Update beta
         
           if beta <= alpha:  # Pruning
@@ -612,8 +632,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         
       elif agentIndex % 2 == 0:  # Current agent is even-numbered ghosts
         # Recurisvely search child nodes.
-        list_of_q_value = [alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)[Q_VALUE] for action in gameState.getLegalActions(agentIndex)]
-        list_of_prob = [getProb(agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
+        list_of_q_value = [alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)[Q_VALUE] for action in legalActions]
+        list_of_prob = [getProb(gameState, agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
         optimal_action, q_value = None, sum([prob * partial_q for prob, partial_q in zip(list_of_prob, list_of_q_value)])
       
       return (optimal_action, q_value)
@@ -631,71 +651,68 @@ def betterEvaluationFunction(currentGameState):
 
   # BEGIN_YOUR_ANSWER
 
-  """
-    features can be used for evaluation function
-     1. ghost_distance: distance between pacman and ghost
-     2. food_distance: distance between pacman and food
-     3. capsule_distance: distance between pacman and capsule
-    
-     4. food_count: number of food
-     5. capsule_count: number of capsule
-     6. scared_ghost_count: number of scared ghost
-     7. ghost_count: number of ghost
-    
-     8. closest_food_distance: distance between pacman and closest food
-     9. closest_capsule_distance: distance between pacman and closest
-    10. closest_scared_ghost_distance: distance between pacman and closest scared ghost
-    11. closest_ghost_distance: distance between pacman and closest ghost
-    
-  """
-
   dict_of_weights = {
-    "food_distance": -1,
-    "capsule_distance": -1,
-    "scared_ghost_distance": 1,
-    "ghost_distance": -1,
+    "avg_of_food_distance": -3,
+    "avg_of_capsule_distance": 0,
+    "avg_of_scared_ghost_distance": -1,
+    "avg_of_non_scared_ghost_distance": 3,
     
-    "food_count": -1,
-    "capsule_count": -1,
-    "scared_ghost_count": 1,
-    "ghost_count": -1,
+    "food_count": -5,
+    "capsule_count": -250,
+    "scared_ghost_count": 0,
+    "non_scared_ghost_count": -0,
     
-    "closest_food_distance": -1,
-    "closest_capsule_distance": -1,
-    "closest_scared_ghost_distance": 1,
-    "closest_ghost_distance": -1,
+    "closest_food_distance": -4,
+    "closest_capsule_distance": -5,
+    "closest_scared_ghost_distance": -39,
+    "closest_non_scared_ghost_distance": 4,
+    "going_to_die": -50,
+    "warning": 0,
+    "overeat_of_capsule": -300
   }
   
   position_of_pacman = currentGameState.getPacmanPosition()
-  position_of_ghosts = currentGameState.getGhostPositions()
-  position_of_food = currentGameState.getFood().asList()
+  position_of_scared_ghosts = [ghost.getPosition() for ghost in currentGameState.getGhostStates() if ghost.scaredTimer > 0]
+  position_of_non_scared_ghosts = [ghost.getPosition() for ghost in currentGameState.getGhostStates() if ghost.scaredTimer == 0]
+  position_of_foods = currentGameState.getFood().asList()
   position_of_capsules = currentGameState.getCapsules()
   
+  list_of_food_distance = [manhattanDistance(position_of_pacman, food) for food in position_of_foods]
+  list_of_capsule_distance = [manhattanDistance(position_of_pacman, capsule) for capsule in position_of_capsules]
   
-  food_distance = []
+  list_of_non_scared_ghost_distance = [manhattanDistance(position_of_pacman, ghost) for ghost in position_of_non_scared_ghosts]
+  list_of_scared_ghost_distance = [manhattanDistance(position_of_pacman, ghost) for ghost in position_of_scared_ghosts]
+  
+  warning = len(list_of_non_scared_ghost_distance) == 2
+  for ghost in position_of_non_scared_ghosts:
+    warning = warning and manhattanDistance(position_of_pacman, ghost) <= 3
   
   dict_of_features = {
-    "sum_of_food_distance": 0,
-    "sum_of_capsule_distance": 0,
-    "sum_of_scared_ghost_distance": 0,
-    "sum_of_ghost_distance": 0,
+    "avg_of_food_distance": sum(list_of_food_distance) / (len(list_of_food_distance) + 1e-9),
+    "avg_of_capsule_distance": sum(list_of_capsule_distance) / (len(list_of_capsule_distance) + 1e-9),
+    "avg_of_scared_ghost_distance": sum(list_of_scared_ghost_distance) / (len(list_of_scared_ghost_distance) + 1e-9),
+    "avg_of_non_scared_ghost_distance": sum(list_of_non_scared_ghost_distance) / (len(list_of_non_scared_ghost_distance) + 1e-9),
     
-    "food_count": 0,
-    "capsule_count": 0,
-    "scared_ghost_count": 0,
-    "ghost_count": 0,
+    "food_count": len(list_of_food_distance),
+    "capsule_count": len(list_of_capsule_distance),
+    "scared_ghost_count": len(list_of_scared_ghost_distance),
+    "non_scared_ghost_count": len(list_of_non_scared_ghost_distance),
     
-    "closest_food_distance": 0,
-    "closest_capsule_distance": 0,
-    "closest_scared_ghost_distance": 0,
-    "closest_ghost_distance": 0,
+    "closest_food_distance": min(list_of_food_distance) if len(list_of_food_distance) > 0 else 0,
+    "closest_capsule_distance": min(list_of_capsule_distance) if len(list_of_capsule_distance) > 0 else 0,
+    "closest_scared_ghost_distance": min(list_of_scared_ghost_distance) if len(list_of_scared_ghost_distance) > 0 else 0,
+    "closest_non_scared_ghost_distance": min(list_of_non_scared_ghost_distance) if len(list_of_non_scared_ghost_distance) > 0 else 0,
+    "going_to_die": 1 if (min(list_of_non_scared_ghost_distance) if len(list_of_non_scared_ghost_distance) else 3) <= 2 and len(list_of_non_scared_ghost_distance) == 2 else 0,
+    "warning": 1 if warning else 0,
+    "overeat_of_capsule": 1 if len(list_of_capsule_distance) <= 2 and len(list_of_non_scared_ghost_distance) != 0 else 0
   }
   
-  score = 0
+  score = 10 * currentGameState.getScore()
   
   for f, w in dict_of_weights.items():
     score += w * dict_of_features[f]
   
+  # return currentGameState.getScore()
   return score
   # END_YOUR_ANSWER
 
