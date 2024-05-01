@@ -73,24 +73,7 @@ parts:
   extraCredit: false
   maxPoints: 0
   maxSeconds: 5
-  messages:
-  - 'Exception thrown: <class ''NotImplementedError''> -- '
-  - "  File \"C:\\Users\\82103\\Desktop\\CSED342\\CSED342\\HW5\\grader.py\", line\
-    \ 148, in <lambda>\n    grader.addBasicPart('5a-1-basic', lambda : testBasic('alphabeta'),\
-    \ 0, description='Tests alphabeta for timeout on smallClassic.')\n"
-  - "  File \"C:\\Users\\82103\\Desktop\\CSED342\\CSED342\\HW5\\grader.py\", line\
-    \ 87, in testBasic\n    stats = run('smallClassic', agent[agentName], [DirectionalGhost(i\
-    \ + 1) for i in range(2)], name='%s (depth %d)' % (agentName, 2))\n"
-  - "  File \"C:\\Users\\82103\\Desktop\\CSED342\\CSED342\\HW5\\grader.py\", line\
-    \ 40, in run\n    games = pacman.runGames(lay, pac, ghosts, disp, nGames, False,\
-    \ catchExceptions=False)\n"
-  - "  File \"C:\\Users\\82103\\Desktop\\CSED342\\CSED342\\HW5\\pacman.py\", line\
-    \ 622, in runGames\n    game.run()\n"
-  - "  File \"C:\\Users\\82103\\Desktop\\CSED342\\CSED342\\HW5\\game.py\", line 652,\
-    \ in run\n    action = agent.getAction(observation)\n"
-  - "  File \"C:\\Users\\82103\\Desktop\\CSED342\\CSED342\\HW5\\submission.py\", line\
-    \ 519, in getAction\n    raise NotImplementedError  # remove this line before\
-    \ writing code\n"
+  messages: []
   name: 5a-1-basic
   points: 0
   seconds: 0
@@ -116,7 +99,7 @@ parts:
   - "  File \"C:\\Users\\82103\\Desktop\\CSED342\\CSED342\\HW5\\grader.py\", line\
     \ 162, in runq6\n    agent = submission.choiceAgent()\n"
   - "  File \"C:\\Users\\82103\\Desktop\\CSED342\\CSED342\\HW5\\submission.py\", line\
-    \ 550, in choiceAgent\n    raise NotImplementedError  # remove this line before\
+    \ 644, in choiceAgent\n    raise NotImplementedError  # remove this line before\
     \ writing code\n"
   name: 6a-no-grading
   points: 0

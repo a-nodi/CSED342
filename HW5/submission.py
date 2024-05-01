@@ -448,7 +448,7 @@ class ExpectiminimaxAgent(MultiAgentSearchAgent):
         list_of_action_and_q_value = [(action, expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
         optimal_action, q_value = min(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])  # Get Ghost's min action and value
         
-      elif agentIndex % 2 == 0:  # Current agnet is even-numbered ghosts
+      elif agentIndex % 2 == 0:  # Current agent is even-numbered ghosts
         # Recurisvely search child nodes.
         list_of_q_value = [expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE] for action in gameState.getLegalActions(agentIndex)]
         list_of_prob = [getProb(agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
@@ -491,7 +491,7 @@ class ExpectiminimaxAgent(MultiAgentSearchAgent):
         list_of_action_and_q_value = [(action, expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
         optimal_action, q_value = min(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])  # Get Ghost's min action and value
         
-      elif agentIndex % 2 == 0:  # Current agnet is even-numbered ghosts
+      elif agentIndex % 2 == 0:  # Current agent is even-numbered ghosts
         # Recurisvely search child nodes.
         list_of_q_value = [expectiminimaxSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex)[Q_VALUE] for action in gameState.getLegalActions(agentIndex)]
         list_of_prob = [getProb(agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
@@ -534,16 +534,28 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       depth = depth - 1 if nextAgentIndex == PLAYER else depth
       
       if agentIndex == PLAYER:  # Current agent is player
+        optimal_action, q_value = None, float('-inf')
         # Recursively search child nodes.
-        list_of_action_and_q_value = [(action, alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
-        optimal_action, q_value = max(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])
+        for action in gameState.getLegalActions(agentIndex):
+          _action, _q_value = alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)
+          optimal_action, q_value = max((action, _q_value), (optimal_action, q_value), key=lambda pair: pair[Q_VALUE])
+          alpha = max(alpha, q_value)  # Update alpha 
+          
+          if beta <= alpha:  # Pruning
+            break
         
       elif agentIndex % 2 == 1:  # Current agent is odd-numbered ghosts
+        optimal_action, q_value = None, float('inf')
         # Recursively search child nodes.
-        list_of_action_and_q_value = [(action, alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)[Q_VALUE]) for action in gameState.getLegalActions(agentIndex)]
-        optimal_action, q_value = min(list_of_action_and_q_value, key=lambda pair: pair[Q_VALUE])  # Get Ghost's min action and value
+        for action in gameState.getLegalActions(agentIndex):
+          _action, _q_value = alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)
+          optimal_action, q_value = min((action, _q_value), (optimal_action, q_value), key=lambda pair: pair[Q_VALUE])
+          beta = min(beta, q_value)  # Update beta
         
-      elif agentIndex % 2 == 0:  # Current agnet is even-numbered ghosts
+          if beta <= alpha:  # Pruning
+            break
+        
+      elif agentIndex % 2 == 0:  # Current agent is even-numbered ghosts
         # Recurisvely search child nodes.
         list_of_q_value = [alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)[Q_VALUE] for action in gameState.getLegalActions(agentIndex)]
         list_of_prob = [getProb(agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
@@ -551,6 +563,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       
       return (optimal_action, q_value)
     
+    return alphabetaSearch(gameState, self.depth, PLAYER, float('-inf'), float('inf'))[ACTION]
     # END_YOUR_ANSWER
   
   def getQ(self, gameState, action):
@@ -558,7 +571,54 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       Returns the expectiminimax Q-Value using self.depth and self.evaluationFunction.
     """
     # BEGIN_YOUR_ANSWER
-    raise NotImplementedError  # remove this line before writing code
+    ACTION = 0
+    Q_VALUE = 1
+    PLAYER = 0
+    
+    def getProb(agentIndex, _action):
+      return 1 / len(gameState.getLegalActions(agentIndex))
+    
+    def alphabetaSearch(gameState, depth, agentIndex, alpha, beta):
+      if gameState.isWin() or gameState.isLose() or depth == 0:  # Terminal node
+        return (None, self.evaluationFunction(gameState))  # No action can be performed, terminal node Q-value
+      
+      # Iterrate Players for each turn (function call)
+      nextAgentIndex = (agentIndex + 1) % gameState.getNumAgents()
+      
+      # Sub depth if all agents have done their action
+      depth = depth - 1 if nextAgentIndex == PLAYER else depth
+      
+      if agentIndex == PLAYER:  # Current agent is player
+        optimal_action, q_value = None, float('-inf')
+        # Recursively search child nodes.
+        for action in gameState.getLegalActions(agentIndex):
+          _action, _q_value = alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)
+          optimal_action, q_value = (action, _q_value) if _q_value > q_value else (optimal_action, q_value)
+          alpha = max(alpha, q_value)  # Update alpha
+          
+          if beta <= alpha:  # Pruning
+            break
+        
+      elif agentIndex % 2 == 1:  # Current agent is odd-numbered ghosts
+        optimal_action, q_value = None, float('inf')
+        # Recursively search child nodes.
+        for action in gameState.getLegalActions(agentIndex):
+          _action, _q_value = alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)
+          optimal_action, q_value = (action, _q_value) if _q_value < q_value else (optimal_action, q_value)
+          beta = min(beta, q_value)  # Update beta
+        
+          if beta <= alpha:  # Pruning
+            break
+        
+      elif agentIndex % 2 == 0:  # Current agent is even-numbered ghosts
+        # Recurisvely search child nodes.
+        list_of_q_value = [alphabetaSearch(gameState.generateSuccessor(agentIndex, action), depth, nextAgentIndex, alpha, beta)[Q_VALUE] for action in gameState.getLegalActions(agentIndex)]
+        list_of_prob = [getProb(agentIndex, action) for action in gameState.getLegalActions(agentIndex)]
+        optimal_action, q_value = None, sum([prob * partial_q for prob, partial_q in zip(list_of_prob, list_of_q_value)])
+      
+      return (optimal_action, q_value)
+    
+    return alphabetaSearch(gameState.generateSuccessor(PLAYER, action), self.depth, PLAYER + 1, float('-inf'), float('inf'))[Q_VALUE]
     # END_YOUR_ANSWER
 
 ######################################################################################
@@ -570,7 +630,73 @@ def betterEvaluationFunction(currentGameState):
   """
 
   # BEGIN_YOUR_ANSWER
-  raise NotImplementedError  # remove this line before writing code
+
+  """
+    features can be used for evaluation function
+     1. ghost_distance: distance between pacman and ghost
+     2. food_distance: distance between pacman and food
+     3. capsule_distance: distance between pacman and capsule
+    
+     4. food_count: number of food
+     5. capsule_count: number of capsule
+     6. scared_ghost_count: number of scared ghost
+     7. ghost_count: number of ghost
+    
+     8. closest_food_distance: distance between pacman and closest food
+     9. closest_capsule_distance: distance between pacman and closest
+    10. closest_scared_ghost_distance: distance between pacman and closest scared ghost
+    11. closest_ghost_distance: distance between pacman and closest ghost
+    
+  """
+
+  dict_of_weights = {
+    "food_distance": -1,
+    "capsule_distance": -1,
+    "scared_ghost_distance": 1,
+    "ghost_distance": -1,
+    
+    "food_count": -1,
+    "capsule_count": -1,
+    "scared_ghost_count": 1,
+    "ghost_count": -1,
+    
+    "closest_food_distance": -1,
+    "closest_capsule_distance": -1,
+    "closest_scared_ghost_distance": 1,
+    "closest_ghost_distance": -1,
+  }
+  
+  position_of_pacman = currentGameState.getPacmanPosition()
+  position_of_ghosts = currentGameState.getGhostPositions()
+  position_of_food = currentGameState.getFood().asList()
+  position_of_capsules = currentGameState.getCapsules()
+  
+  
+  food_distance = []
+  
+  dict_of_features = {
+    "sum_of_food_distance": 0,
+    "sum_of_capsule_distance": 0,
+    "sum_of_scared_ghost_distance": 0,
+    "sum_of_ghost_distance": 0,
+    
+    "food_count": 0,
+    "capsule_count": 0,
+    "scared_ghost_count": 0,
+    "ghost_count": 0,
+    
+    "closest_food_distance": 0,
+    "closest_capsule_distance": 0,
+    "closest_scared_ghost_distance": 0,
+    "closest_ghost_distance": 0,
+  }
+  
+  score = 0
+  
+  for f, w in dict_of_weights.items():
+    score += w * dict_of_features[f]
+  
+  return score
   # END_YOUR_ANSWER
 
 def choiceAgent():
@@ -581,7 +707,17 @@ def choiceAgent():
     (e.g. 'MinimaxAgent', 'BiasedExpectimaxAgent', 'MyOwnAgent', ...)
   """
   # BEGIN_YOUR_ANSWER
-  raise NotImplementedError  # remove this line before writing code
+  option = 5 - 1  # Index of the agent will be choosed 
+  
+  list_of_agent_names = [
+    'MinimaxAgent',
+    'ExpectimaxAgent',
+    'BiasedExpectimaxAgent',
+    'ExpectiminimaxAgent',
+    'AlphaBetaAgent'
+  ]
+  
+  return list_of_agent_names[option]
   # END_YOUR_ANSWER
 
 # Abbreviation
