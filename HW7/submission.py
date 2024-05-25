@@ -232,11 +232,11 @@ class ParticleFilter(object):
         
         dict_of_weight = {}
         
-        for row, col in self.particles:
+        for (row, col), number_of_particle in self.particles.items():
             x, y = util.colToX(col), util.rowToY(row)
             distance = euclidean_distance((agentX, agentY), (x, y))
             probability = util.pdf(distance, Const.SONAR_STD, observedDist)
-            dict_of_weight[(row, col)] = probability * self.particles[(row, col)]
+            dict_of_weight[(row, col)] = probability * number_of_particle
         
         self.particles = {}
         
@@ -275,7 +275,7 @@ class ParticleFilter(object):
     ##################################################################################
     def elapseTime(self) -> None:
         # BEGIN_YOUR_CODE (our solution is 6 lines of code, but don't worry if you deviate from this)
-    
+        pass
         # END_YOUR_CODE
 
     # Function: Get Belief
