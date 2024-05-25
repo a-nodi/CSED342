@@ -304,6 +304,8 @@ class ParticleFilter(object):
             for _ in range(0, number_of_particle):
                 weight = self.transProbDict[particle]
                 transitioned_particle = util.weightedRandomChoice(weight)
+                if transitioned_particle not in dict_of_particle:
+                    dict_of_particle[transitioned_particle] = 0
                 dict_of_particle[transitioned_particle] += 1
         
         self.particles = dict_of_particle
