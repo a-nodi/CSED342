@@ -275,7 +275,7 @@ class ParticleFilter(object):
     ##################################################################################
     def elapseTime(self) -> None:
         # BEGIN_YOUR_CODE (our solution is 6 lines of code, but don't worry if you deviate from this)
-
+    
         # END_YOUR_CODE
 
     # Function: Get Belief
