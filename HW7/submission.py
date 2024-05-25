@@ -52,20 +52,24 @@ class ExactInference(object):
 
     def observe(self, agentX: int, agentY: int, observedDist: float) -> None:
         # BEGIN_YOUR_CODE (our solution is 9 lines of code, but don't worry if you deviate from this)
+        # Euclidean distance function
         def euclidean_distance(coord1, coord2):
             x1, y1 = coord1
             x2, y2 = coord2
             return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
         
+        # Initialize pdf matrix
         pdf_matrix = [[None for i in range(0, self.belief.numCols)] for j in range(0, self.belief.numRows)]
         
         # Calcuate distance and pdf of each coord
         for row in range(0, self.belief.numRows):
             for col in range(0, self.belief.numCols):
                 x, y = util.colToX(col), util.rowToY(row)
-                belief_coord = (x, y)
-                agent_coord = (agentX, agentY)
-                average_distance = euclidean_distance(agent_coord, belief_coord)
+                belief_coord = (x, y)  # Coordiante of the belief
+                agent_coord = (agentX, agentY)  # Coordinate of the agent
+                average_distance = euclidean_distance(agent_coord, belief_coord)  # Mean of the pdf
+                
+                # Calculate emission probability distribution
                 pdf_matrix[row][col] = util.pdf(average_distance, Const.SONAR_STD, observedDist) * self.belief.getProb(row, col)
                 
         # Update belief
@@ -75,7 +79,7 @@ class ExactInference(object):
                     continue
                 self.belief.setProb(row, col, pdf_matrix[row][col])
         
-        self.belief.normalize()
+        self.belief.normalize()  # Normalize belief after updating
         # END_YOUR_CODE
 
     ##################################################################################
@@ -102,16 +106,20 @@ class ExactInference(object):
         if self.skipElapse: ### ONLY FOR THE GRADER TO USE IN Problem 1
             return
         # BEGIN_YOUR_CODE (our solution is 8 lines of code, but don't worry if you deviate from this)
+        # Initialize probability matrix
         probability_matrix = [[0 for i in range(0, self.belief.numCols)] for j in range(0, self.belief.numRows)]
         
         for transition_probability in self.transProb.items():
-            # pack out transition probability pair
+            # Pack out transition probability pair
             old_tile, new_tile = transition_probability[0]
             old_row, old_col = old_tile
             new_row, new_col = new_tile
+
+            # Calculate probability
             probability = transition_probability[1] * self.belief.getProb(old_row, old_col)
             probability_matrix[new_row][new_col] += probability
         
+        # Reset belief
         for row in range(0, self.belief.numRows):
             for col in range(0, self.belief.numCols):
                 self.belief.setProb(row, col, 0)
@@ -120,9 +128,11 @@ class ExactInference(object):
             # pack out transition probability pair
             old_tile, new_tile = transition_probability[0]
             new_row, new_col = new_tile
-            # self.belief.setProb(new_row, new_col, 0)
-            self.belief.addProb(new_row, new_col, probability_matrix[new_row][new_col])
             
+            # Calculate C_t+1 probability
+            self.belief.addProb(new_row, new_col, probability_matrix[new_row][new_col])
+        
+        # Normalize belief after updating
         self.belief.normalize()
         # END_YOUR_CODE
 
@@ -225,22 +235,28 @@ class ParticleFilter(object):
     ##################################################################################
     def observe(self, agentX: int, agentY: int, observedDist: float) -> None:
         # BEGIN_YOUR_CODE (our solution is 13 lines of code, but don't worry if you deviate from this)
+        # Euclidean distance function
         def euclidean_distance(coord1, coord2):
             x1, y1 = coord1
             x2, y2 = coord2
             return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
         
+        # Initialize dictionary of weight
         dict_of_weight = {}
         
+        # Calculate probability of each particle
         for (row, col), number_of_particle in self.particles.items():
             x, y = util.colToX(col), util.rowToY(row)
             distance = euclidean_distance((agentX, agentY), (x, y))
-            probability = util.pdf(distance, Const.SONAR_STD, observedDist)
-            dict_of_weight[(row, col)] = probability * number_of_particle
+            
+            # Calculate pdf
+            pdf = util.pdf(distance, Const.SONAR_STD, observedDist)
+            dict_of_weight[(row, col)] = pdf * number_of_particle
         
-        self.particles = {}
+        self.particles = collections.defaultdict(int)
         
-        for i in range(0, self.NUM_PARTICLES):
+        # Resample particles (formatted according to the pdf)
+        for _ in range(self.NUM_PARTICLES):
             new_particle = util.weightedRandomChoice(dict_of_weight)
             if new_particle not in self.particles:
                 self.particles[new_particle] = 0
@@ -275,12 +291,23 @@ class ParticleFilter(object):
     ##################################################################################
     def elapseTime(self) -> None:
         # BEGIN_YOUR_CODE (our solution is 6 lines of code, but don't worry if you deviate from this)
-        pass
+        dict_of_particle = collections.defaultdict(int)
+        
+        # Transition particles (formatted according to the pdf)        
+        for particle in self.particles:
+            number_of_particle = self.particles[particle]
+            # for each particle, transition it to the next particle
+            for _ in range(0, number_of_particle):
+                weight = self.transProbDict[particle]
+                transitioned_particle = util.weightedRandomChoice(weight)
+                dict_of_particle[transitioned_particle] += 1
+        
+        self.particles = dict_of_particle
         # END_YOUR_CODE
 
     # Function: Get Belief
     # ---------------------
     # Returns your belief of the probability that the car is in each tile. Your
     # belief probabilities should sum to 1.
-    def getBelief(self) -> Belief:
+    def getBelief(self) -> Belief:  
         return self.belief
