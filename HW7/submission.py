@@ -52,7 +52,30 @@ class ExactInference(object):
 
     def observe(self, agentX: int, agentY: int, observedDist: float) -> None:
         # BEGIN_YOUR_CODE (our solution is 9 lines of code, but don't worry if you deviate from this)
-        raise NotImplementedError
+        def euclidean_distance(coord1, coord2):
+            x1, y1 = coord1
+            x2, y2 = coord2
+            return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+        
+        pdf_matrix = [[None for i in range(0, self.belief.numCols)] for j in range(0, self.belief.numRows)]
+        
+        # Calcuate distance and pdf of each coord
+        for row in range(0, self.belief.numRows):
+            for col in range(0, self.belief.numCols):
+                x, y = util.colToX(col), util.rowToY(row)
+                belief_coord = (x, y)
+                agent_coord = (agentX, agentY)
+                average_distance = euclidean_distance(agent_coord, belief_coord)
+                pdf_matrix[row][col] = util.pdf(average_distance, Const.SONAR_STD, observedDist) * self.belief.getProb(row, col)
+                
+        # Update belief
+        for row in range(0, self.belief.numRows):
+            for col in range(0, self.belief.numCols):
+                if pdf_matrix[row][col] is None:
+                    continue
+                self.belief.setProb(row, col, pdf_matrix[row][col])
+        
+        self.belief.normalize()
         # END_YOUR_CODE
 
     ##################################################################################
@@ -79,7 +102,28 @@ class ExactInference(object):
         if self.skipElapse: ### ONLY FOR THE GRADER TO USE IN Problem 1
             return
         # BEGIN_YOUR_CODE (our solution is 8 lines of code, but don't worry if you deviate from this)
-        raise NotImplementedError
+        probability_matrix = [[0 for i in range(0, self.belief.numCols)] for j in range(0, self.belief.numRows)]
+        
+        for transition_probability in self.transProb.items():
+            # pack out transition probability pair
+            old_tile, new_tile = transition_probability[0]
+            old_row, old_col = old_tile
+            new_row, new_col = new_tile
+            probability = transition_probability[1] * self.belief.getProb(old_row, old_col)
+            probability_matrix[new_row][new_col] += probability
+        
+        for row in range(0, self.belief.numRows):
+            for col in range(0, self.belief.numCols):
+                self.belief.setProb(row, col, 0)
+                
+        for transition_probability in self.transProb.items():
+            # pack out transition probability pair
+            old_tile, new_tile = transition_probability[0]
+            new_row, new_col = new_tile
+            # self.belief.setProb(new_row, new_col, 0)
+            self.belief.addProb(new_row, new_col, probability_matrix[new_row][new_col])
+            
+        self.belief.normalize()
         # END_YOUR_CODE
 
     # Function: Get Belief
@@ -181,7 +225,27 @@ class ParticleFilter(object):
     ##################################################################################
     def observe(self, agentX: int, agentY: int, observedDist: float) -> None:
         # BEGIN_YOUR_CODE (our solution is 13 lines of code, but don't worry if you deviate from this)
-        raise NotImplementedError
+        def euclidean_distance(coord1, coord2):
+            x1, y1 = coord1
+            x2, y2 = coord2
+            return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+        
+        dict_of_weight = {}
+        
+        for row, col in self.particles:
+            x, y = util.colToX(col), util.rowToY(row)
+            distance = euclidean_distance((agentX, agentY), (x, y))
+            probability = util.pdf(distance, Const.SONAR_STD, observedDist)
+            dict_of_weight[(row, col)] = probability * self.particles[(row, col)]
+        
+        self.particles = {}
+        
+        for i in range(0, self.NUM_PARTICLES):
+            new_particle = util.weightedRandomChoice(dict_of_weight)
+            if new_particle not in self.particles:
+                self.particles[new_particle] = 0
+                
+            self.particles[new_particle] += 1
         # END_YOUR_CODE
 
         self.updateBelief()
@@ -211,7 +275,7 @@ class ParticleFilter(object):
     ##################################################################################
     def elapseTime(self) -> None:
         # BEGIN_YOUR_CODE (our solution is 6 lines of code, but don't worry if you deviate from this)
-        raise NotImplementedError
+
         # END_YOUR_CODE
 
     # Function: Get Belief
