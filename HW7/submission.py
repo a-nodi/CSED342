@@ -109,6 +109,7 @@ class ExactInference(object):
         # Initialize probability matrix
         probability_matrix = [[0 for i in range(0, self.belief.numCols)] for j in range(0, self.belief.numRows)]
         
+        # Calculate probability of each tile
         for transition_probability in self.transProb.items():
             # Pack out transition probability pair
             old_tile, new_tile = transition_probability[0]
@@ -123,7 +124,8 @@ class ExactInference(object):
         for row in range(0, self.belief.numRows):
             for col in range(0, self.belief.numCols):
                 self.belief.setProb(row, col, 0)
-                
+        
+        # Update belief
         for transition_probability in self.transProb.items():
             # pack out transition probability pair
             old_tile, new_tile = transition_probability[0]
@@ -246,6 +248,7 @@ class ParticleFilter(object):
         
         # Calculate probability of each particle
         for (row, col), number_of_particle in self.particles.items():
+            # pack out particle coordinate and calculate distance
             x, y = util.colToX(col), util.rowToY(row)
             distance = euclidean_distance((agentX, agentY), (x, y))
             
@@ -253,6 +256,7 @@ class ParticleFilter(object):
             pdf = util.pdf(distance, Const.SONAR_STD, observedDist)
             dict_of_weight[(row, col)] = pdf * number_of_particle
         
+        # Reset particles
         self.particles = collections.defaultdict(int)
         
         # Resample particles (formatted according to the pdf)
