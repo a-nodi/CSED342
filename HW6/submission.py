@@ -14,11 +14,13 @@ def create_chain_csp(n):
     csp = util.CSP()
     # Problem 1a
     # BEGIN_YOUR_ANSWER
+    def xor(a, b):
+        return a ^ b
+
     for variable in variables:
         csp.add_variable(variable, domain)
-    
-    for i in range(n-1):
-        csp.add_binary_factor(variables[i], variables[i+1], lambda i, j: i ^ j)
+    for i in range(0, n - 1):
+        csp.add_binary_factor(variables[i], variables[i + 1], xor)
     # END_YOUR_ANSWER
     return csp
 
@@ -39,7 +41,24 @@ def create_nqueens_csp(n = 8):
     csp = util.CSP()
     # Problem 2a
     # BEGIN_YOUR_ANSWER
-    raise NotImplementedError
+
+    domain = [i for i in range(0, n)]
+
+    for i in range(0, n):
+        csp.add_variable(f"queen_{i}", domain)
+
+    # Index of queen works as x-coord of chess board
+    # Value of queen works as y-coord of chess board
+    # Constraint to solve this in O(n)
+    # 1. y-coord of different queens should be different
+    # 2. difference of x-coord and difference of y-coord should be different with two different queens 
+    # (If same, two queens are in diagonal position)
+    
+    for i in range(0, n):
+        for j in range(i + 1, n):
+            csp.add_binary_factor(f"queen_{i}", f"queen_{j}", lambda queen1, queen2: queen1 != queen2)
+            csp.add_binary_factor(f"queen_{i}", f"queen_{j}", lambda queen1, queen2: abs(queen1 - queen2) != j - i)
+
     # END_YOUR_ANSWER
     return csp
 
@@ -215,7 +234,22 @@ class BacktrackingSearch():
             #       assignment, a variable, and a proposed value to this variable
             # Hint: for ties, choose the variable with lowest index in self.csp.variables
             # BEGIN_YOUR_ANSWER
-            raise NotImplementedError
+            def is_not_assigned(_variable):
+                return _variable not in assignment
+
+            # Filter unassigned variable
+            list_of_unassigned_variable = filter(is_not_assigned, [variable for variable in self.csp.variables])
+            list_of_variable_score_pair = []
+
+            # Index and variable name
+            for variable in list_of_unassigned_variable:
+                score = sum([self.get_delta_weight(assignment, variable, value) for value in self.domains[variable]])  # Calculate score of current variable
+                list_of_variable_score_pair.append((variable, score))  # Store score with coresponding variable
+
+            # Argmin variable
+            min_score_variable = min(list_of_variable_score_pair, key=lambda pair: pair[1])[0]
+
+            return min_score_variable            
             # END_YOUR_ANSWER
 
 
@@ -244,7 +278,53 @@ def get_sum_variable(csp, name, variables, maxSum):
     """
     # Problem 3a
     # BEGIN_YOUR_ANSWER
-    raise NotImplementedError
+    PREVIOUS, CURRENT = 0, 1
+
+    def is_aux_pair_valid(_previous_aux_variable, _current_aux_variable):
+        return _previous_aux_variable[CURRENT] == _current_aux_variable[PREVIOUS]
+    
+    def is_summation_valid(_variable, _aux_variable):
+        return _aux_variable[CURRENT] - _aux_variable[PREVIOUS] == _variable
+
+    def is_result(_result, _last_aux_variable):
+        return _result == _last_aux_variable[CURRENT]
+
+    # Result aux variable
+    result = ('sum', name, 'result')
+
+    # Edge case, Enforce the result value be 0 
+    if len(variables) == 0:
+        csp.add_variable(result, [0])
+        return result
+    
+    # Add result aux varable
+    csp.add_variable(result, list(range(0, maxSum + 1)))
+
+    # Pair-wise domain for adding up variables sequently
+    pair_domain = [(previous_aux_value, current_aux_value) for previous_aux_value in range(maxSum + 1) for current_aux_value in range(maxSum + 1)]
+
+    # Add aux variables & constraints
+    for i, variable in enumerate(variables):
+        # Create and add variable
+        aux_variable = ('sum', name, i)
+        
+        # Compress domain of first variable to be efficient
+        if i == 0:
+            csp.add_variable(aux_variable, [(0, value) for value in csp.values[variable[0]]])
+        else:
+            csp.add_variable(aux_variable, pair_domain)
+        
+        # Add constraint
+        csp.add_binary_factor(variable, aux_variable, is_summation_valid)  # Summation constraint. Aux variables will have values related to variable's value
+    
+    # Pair up neighbourhood aux variable's values.
+    for previous, current in zip(list(range(0, len(variables) - 1)), list(range(1, len(variables)))):
+        csp.add_binary_factor(('sum', name, previous), ('sum', name, current), is_aux_pair_valid)
+    
+    # Set result value
+    csp.add_binary_factor(result, ("sum", name, len(variables) - 1), is_result)
+    
+    return result
     # END_YOUR_ANSWER
 
 def create_lightbulb_csp(buttonSets, numButtons):
@@ -267,6 +347,52 @@ def create_lightbulb_csp(buttonSets, numButtons):
 
     # Problem 3b
     # BEGIN_YOUR_ANSWER
-    raise NotImplementedError
+    ON, OFF = True, False
+    PREVIOUS, CURRENT = 0, 1
+    
+    def is_pair_valid(_previous_aux_variable, _current_aux_variable):
+        return _previous_aux_variable[CURRENT] == _current_aux_variable[PREVIOUS]
+    
+    def is_toggling_valid(state, pair): 
+        return pair[CURRENT] == (pair[PREVIOUS] == state)
+
+    def is_result(_result, _last_aux_variable):
+        return _result == _last_aux_variable[CURRENT]
+
+    # Domain
+    domain = [OFF, ON]
+    # Pair-wise domain for toggling variables sequently
+    pair_domain = [(OFF, OFF), (OFF, ON), (ON, OFF), (ON, ON)]
+
+    for button_index in range(numButtons): 
+        csp.add_variable(button_index, [OFF, ON])  # Add button as variable
+    
+    for bulb_index in range(numBulbs):
+        # Result aux variable
+        result = ('toggle', bulb_index, "currently_toggle_applied")
+        csp.add_variable(result, domain)
+        
+        if len(buttonSets[bulb_index]) == 0:  # Edge case: No button is connected to current bulb
+            csp.add_unary_factor(result, lambda state: state == OFF)
+
+        else:
+            # Create and add variable
+            for i, buttonIndex in enumerate(buttonSets[bulb_index]):
+                aux_variable = ('toggle', bulb_index, i)
+                csp.add_variable(aux_variable, pair_domain)
+                csp.add_binary_factor(buttonIndex, aux_variable, is_toggling_valid)  # Toggling constraint. Aux variables will have values related to variable's value
+            
+            # Prev bulb of first bulb doesn't exist
+            csp.add_unary_factor(('toggle', bulb_index, 0), lambda aux: aux[PREVIOUS] == OFF)            
+            
+            # Pair up neighbourhood aux variable's values.
+            for previous, current in zip(list(range(0, len(buttonSets[bulb_index]) - 1)), list(range(1, len(buttonSets[bulb_index])))):
+                csp.add_binary_factor(('toggle', bulb_index, previous), ('toggle', bulb_index, current), is_pair_valid)
+
+            # Set result value
+            csp.add_binary_factor(result, ('toggle', bulb_index, len(buttonSets[bulb_index]) - 1), is_result)
+        
+        # Current bulb should be turned on
+        csp.add_unary_factor(result, lambda state: state == ON)
     # END_YOUR_ANSWER
     return csp
