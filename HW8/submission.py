@@ -44,7 +44,7 @@ def formula1d():
     Freshman = Atom('Freshman') # whether one is freshman
     # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
     ComputerOrNotFreshman = Or(Computer, Not(Freshman))
-    return Implies(ComputerOrNotFreshman, Access)
+    return Implies(Access, ComputerOrNotFreshman)
     # END_YOUR_CODE
 
 # Sentence: "There are 10 students and they all pass artificial intelligence course."
