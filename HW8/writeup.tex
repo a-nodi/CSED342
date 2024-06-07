@@ -7,8 +7,8 @@
 {\Large CSED342 Assignment 8 \vspace{10pt}}
 
 \begin{tabular}{rl}
-Student ID: & 00000000 \\
-Name: & GilDong Hong \\
+Student ID: & 20220923 \\
+Name: & Yoonhyeok Lee \\
 \end{tabular}
 \end{center}
 
@@ -18,10 +18,62 @@ By turning in this assignment, I agree by the POSTECH honor code and declare tha
 
 \section*{Problem 2a}
 
-\verb|write your answer|
+This is our given KB.
+\begin{align*}
+KB = \{(A \lor B ) \rightarrow \lnot C, \lnot (\lnot A \land C) \rightarrow D, A \} \\
+\end{align*}
+First, we will change each knowledge into CNF.
+\begin{align*}
+ (A \lor B) \rightarrow \lnot C & \iff \lnot (A \lor B) \lor \lnot C \\
+ & \iff (\lnot A \land \lnot B) \lor \lnot C \\
+ & \iff (\lnot A \lor \lnot C) \land (\lnot B \lor \lnot C) \\
+\lnot (\lnot A \lor C) \rightarrow D & \iff \lnot \lnot (\lnot A \lor C) \lor D  \\
+& \iff \lnot A \lor C \lor D  \\
+\end{align*}
+The resulting KB is this.
+\begin{align*}
+KB = \{(\lnot A \lor \lnot C) \land (\lnot B \lor \lnot C), \lnot A \lor C \lor D, A\} \\
+\end{align*}
+Second, split the knowledge and change it into implied form.
+\begin{align*}
+KB & = \{(\lnot A \lor \lnot C) \land (\lnot B \lor \lnot C), \lnot A \lor C \lor D, A \} \\
+& = \{(\lnot A \lor \lnot C) \land (\lnot B \lor \lnot C), (\lnot A \lor C) \lor D, A \} \\
+& = \{\lnot A \lor \lnot C, \lnot B \lor \lnot C, \lnot (A \land \lnot C) \lor D, A \} \\
+& = \{A \rightarrow \lnot C, B \rightarrow \lnot C, (A, \lnot C) \rightarrow D, A \}  \\
+\end{align*}
+Third, Use modus ponens.
+\begin{align*}
+\frac{A \rightarrow \lnot C, A}{\lnot C} , \quad & KB = \{ \lnot C, B \rightarrow \lnot C, (A, \lnot C) \rightarrow D, A\} \\
+\frac{(A, \lnot C) \rightarrow D, (A, \lnot C)}{D} , \quad & KB = \{ \lnot C, B \rightarrow \lnot C, D, A\} \\
+\end{align*}
+Therefore, we can imply D from the given KB.
 
 \section*{Problem 2b}
 
-\verb|write your answer|
-
+This is our given KB.
+\begin{align*}
+KB = \{ A \lor B, B \rightarrow C, (A \lor C) \rightarrow D \}
+\end{align*}
+First, we will change each knowledge into CNF.
+\begin{align*}
+B \rightarrow C & \iff \lnot B \lor C \\
+(A \lor C) \rightarrow D & \iff \lnot (A \lor C ) \lor D \\
+& \iff (\lnot A \land \lnot C) \lor D \\
+& \iff (\lnot A \lor D) \land (\lnot C \lor D)
+\end{align*}
+The resulting KB is this.
+\begin{align*}
+KB = \{A \lor B, \lnot B \lor C, (\lnot A \lor D) \land (\lnot C \lor D)\}
+\end{align*}
+Second, split the split the knowledge.
+\begin{align*}
+KB = \{A \lor B, \lnot B \lor C, \lnot A \lor D, \lnot C \lor D\}
+\end{align*}
+Third, resolve the knowledge.
+\begin{align*}
+\frac{A \lor B, \lnot B \lor C}{A \lor C}, & KB = \{A \lor B, \lnot B \lor C, A \lor C, \lnot A \lor D, \lnot C \lor D \} \\
+\frac{A \lor C, \lnot A \lor D}{C \lor D}, & KB = \{A \lor B, \lnot B \lor C, A \lor C,C \lor D, \lnot A \lor D, \lnot C \lor D \} \\
+\frac{C \lor D, \lnot C \lor D}{D}, & KB = \{A \lor B, \lnot B \lor C, A \lor C,C \lor D, \lnot A \lor D, \lnot C \lor D, D \} \\
+\end{align*}
+Therefore, we can imply D from the given KB.
 \end{document}
