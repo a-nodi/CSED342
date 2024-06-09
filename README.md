@@ -1,2 +1,2 @@
-2024-Spring CSED342 Homeworks
-=============================
+POSTECH CSED342 Artificial Intelligence (2024 Spring) Programming Homeworks
+===========================================================================
